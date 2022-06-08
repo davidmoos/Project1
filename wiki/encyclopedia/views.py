@@ -11,7 +11,14 @@ def index(request):
 
 def title(request, title):
     content_md = util.get_entry(title)
-    content_html = Markdown().convert(content_md)
-    return render(request, "encyclopedia/title.html", {
-         "content": content_html
+
+    if content_md is not None:
+        content_html = Markdown().convert(content_md)
+        return render(request, "encyclopedia/title.html", {
+         "content": content_html,
+         "title": title.capitalize()
+        })
+    else:
+        return render(request, "encyclopedia/error.html", {
+
         })

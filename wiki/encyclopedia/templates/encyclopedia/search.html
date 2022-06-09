@@ -1,0 +1,18 @@
+{% extends "encyclopedia/layout.html" %}
+
+{% block title %}
+    Encyclopedia
+{% endblock %}
+
+{% block body %}
+    <h1>Not found</h1>
+    The requested entry was not found. Did you mean:
+    <ul>
+        {% for entry in entries %}
+            <li>
+            <a href="{% url 'wiki:title' title=entry %}">{{ entry }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

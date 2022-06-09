@@ -1,11 +1,14 @@
-from django.shortcuts import render
 from markdown2 import Markdown
 from django.shortcuts import render, redirect
-from django.db.models import Q
+from django import forms
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from . import util
 
-
+class NewPageForm(forms.Form):
+    title = forms.CharField(label="Title")
+    text = forms.CharField(widget=forms.Textarea(), label="Text")
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -40,5 +43,20 @@ def search(request):
             search = [i for i in util.list_entries() if q_low in i.lower()]
             return render(request, "encyclopedia/search.html", {
             "entries": search
-
         })
+
+def newpage(request):
+    if request.method == "POST":
+        form = NewPageForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            text = form.cleaned_data["text"]
+            util.save_entry(title, text)
+            return HttpResponseRedirect(reverse("wiki:index"))
+        else:
+            return render(request, "encyclopedia/newpage.html", {
+            "form": form
+            })
+    return render(request, "encyclopedia/newpage.html", {
+        "form": NewPageForm()
+    })

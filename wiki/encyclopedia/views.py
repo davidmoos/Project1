@@ -51,8 +51,13 @@ def newpage(request):
         if form.is_valid():
             title = form.cleaned_data["title"]
             text = form.cleaned_data["text"]
-            util.save_entry(title, text)
-            return HttpResponseRedirect(reverse("wiki:index"))
+            if title.lower() not in (i.lower() for i in util.list_entries()):
+                util.save_entry(title, text)
+                return redirect("wiki:title", title)
+            else:
+                return render(request, "encyclopedia/error2.html", {
+                "title": title.capitalize()
+                })
         else:
             return render(request, "encyclopedia/newpage.html", {
             "form": form

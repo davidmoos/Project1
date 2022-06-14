@@ -10,6 +10,9 @@ class NewPageForm(forms.Form):
     title = forms.CharField(label="Title")
     text = forms.CharField(widget=forms.Textarea(), label="Text")
 
+class EditPageForm(forms.Form):
+    text = forms.CharField(widget=forms.Textarea(), label="Text")
+
 def index(request):
     return render(request, "encyclopedia/index.html", {
         "entries": util.list_entries()
@@ -18,8 +21,6 @@ def index(request):
 
 def title(request, title):
     content_md = util.get_entry(title)
-
-
     if content_md is not None:
         content_html = Markdown().convert(content_md)
         return render(request, "encyclopedia/title.html", {
@@ -65,3 +66,24 @@ def newpage(request):
     return render(request, "encyclopedia/newpage.html", {
         "form": NewPageForm()
     })
+
+def editpage(request, title):
+    if request.method == "POST":
+        form = EditPageForm(request.POST)
+        if form.is_valid():
+            text = form.cleaned_data["text"]
+            util.save_entry(title, text)
+            return redirect("wiki:title", title)
+        else:
+            text = util.get_entry(title)
+            return render(request, "encyclopedia/editpage.html", {
+            "title": title,
+            "form": EditPageForm(initial={'text':text})
+            })
+
+    else:
+        text = util.get_entry(title)
+        return render(request, "encyclopedia/editpage.html", {
+        "title": title,
+        "form": EditPageForm(initial={'text':text})
+        })

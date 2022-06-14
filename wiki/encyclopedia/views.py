@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django import forms
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+import random
 
 from . import util
 
@@ -87,3 +88,8 @@ def editpage(request, title):
         "title": title,
         "form": EditPageForm(initial={'text':text})
         })
+
+def randompage(request):
+        title = random.choice(util.list_entries())
+        return redirect("wiki:title", title)
+    
